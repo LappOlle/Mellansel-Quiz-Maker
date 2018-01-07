@@ -33,7 +33,7 @@
           
         </Grid>
         <TextBox Grid.Column="1" Grid.Row="0" Grid.ColumnSpan="3" HorizontalAlignment="Center" MinWidth="100" VerticalAlignment="Center" FontSize="30" Text="{Binding HeaderText}"/>
-        <Grid Grid.Column="1" Grid.Row="1" Grid.ColumnSpan="3" Background="Beige">
+        <Grid Grid.Column="1" Grid.Row="1" Grid.ColumnSpan="3">
             <Image Source="{Binding SelectedPicture}"/>
         </Grid>
         <StackPanel Orientation="Horizontal" Grid.Column="1" Grid.Row="4">

@@ -7,6 +7,7 @@ using System;
 using Microsoft.Win32;
 using System.IO;
 using System.Windows;
+using Newtonsoft.Json;
 
 namespace Mellansel_Quiz_Maker.ViewModel
 {
@@ -262,25 +263,143 @@ namespace Mellansel_Quiz_Maker.ViewModel
 
         public MainViewModel()
         {
+            initializeApplication();
+        }
+
+        private void initializeApplication()
+        {
             Pictures = new List<BitmapImage>();
             Pictures.Add(new BitmapImage());
             QuestionsAnswers = new List<QuestionData>();
             QuestionsAnswers.Add(new QuestionData());
+            SelectedPicture = null;
+            BackgroundPicture = null;
+            SelectedQuestion = 1;
+            QuestionText = "";
+            Alternative1Text = "";
+            Alternative2Text = "";
+            Alternative3Text = "";
+            Alt1Correct = false;
+            Alt2Correct = false;
+            Alt3Correct = false;
+            DeleteQuestionCommand.RaiseCanExecuteChanged();
+            HeaderText = "Här kan du skriva vilken rubrik du vill ha.";
         }
 
         private void SaveQuestions()
         {
+            if(Pictures[QuestionsAnswers.Count -1].UriSource == null || BackgroundPicture.UriSource == null || QuestionsAnswers[QuestionsAnswers.Count - 1].Question == null ||
+                QuestionsAnswers[QuestionsAnswers.Count - 1].AlternativeOne == null || QuestionsAnswers[QuestionsAnswers.Count - 1].AlternativeTwo == null ||
+                QuestionsAnswers[QuestionsAnswers.Count - 1].AlternativeThree == null || HeaderText == null || QuestionsAnswers[QuestionsAnswers.Count - 1].Answer == null)
+            {
+                MessageBox.Show("Du måste fylla ialla fält eller ta bort den påbörjade frågan innan du exporterar.");
+                return;
+            }
             string dummyFileName = "Spara här";
-
             SaveFileDialog sf = new SaveFileDialog();
-            // Feed the dummy name to the save dialog
+           
             sf.FileName = dummyFileName;
             var result = sf.ShowDialog();
             if((bool)result)
             {
                 string savePath = Path.GetDirectoryName(sf.FileName);
+                var index = 1;
+                foreach(var pic in Pictures)
+                {
+                    if (pic.UriSource != null)
+                    {
+                        var extension = Path.GetExtension(pic.UriSource.AbsolutePath.ToLower());
+
+                        switch (extension)
+                        {
+                            case ".jpg":
+                            case ".jpeg":
+                                {
+                                    FileStream stream = new FileStream(Path.Combine(savePath, index + extension), FileMode.Create);
+                                    BitmapEncoder encoder = new JpegBitmapEncoder();
+                                    encoder.Frames.Add(BitmapFrame.Create(pic));
+                                    encoder.Save(stream);
+                                    stream.Dispose();
+                                    index++;
+                                    break;
+                                }
+                            case ".png":
+                                {
+                                    FileStream stream = new FileStream(Path.Combine(savePath, index + extension), FileMode.Create);
+                                    BitmapEncoder encoder = new PngBitmapEncoder();
+                                    encoder.Frames.Add(BitmapFrame.Create(pic));
+                                    encoder.Save(stream);
+                                    stream.Dispose();
+                                    index++;
+                                    break;
+                                }
+                            case ".bmp":
+                                {
+                                    FileStream stream = new FileStream(Path.Combine(savePath, index + extension), FileMode.Create);
+                                    BitmapEncoder encoder = new BmpBitmapEncoder();
+                                    encoder.Frames.Add(BitmapFrame.Create(pic));
+                                    encoder.Save(stream);
+                                    stream.Dispose();
+                                    index++;
+                                    break;
+                                }
+                            case ".gif":
+                                {
+                                    FileStream stream = new FileStream(Path.Combine(savePath, index + extension), FileMode.Create);
+                                    BitmapEncoder encoder = new GifBitmapEncoder();
+                                    encoder.Frames.Add(BitmapFrame.Create(pic));
+                                    encoder.Save(stream);
+                                    stream.Dispose();
+                                    index++;
+                                    break;
+                                }
+                        }
+                    }
+                }
+                var backgroundExtension = Path.GetExtension(BackgroundPicture.UriSource.AbsoluteUri.ToLower());
+                switch (backgroundExtension)
+                {
+                    case ".jpg": case ".jpeg":
+                        {
+                            FileStream stream = new FileStream(Path.Combine(savePath, "background" + "#" + HeaderText + backgroundExtension), FileMode.Create);
+                            BitmapEncoder encoder = new JpegBitmapEncoder();
+                            encoder.Frames.Add(BitmapFrame.Create(BackgroundPicture));
+                            encoder.Save(stream);
+                            stream.Dispose();
+                            break;
+                        }
+                    case ".png":
+                        {
+                            FileStream stream = new FileStream(Path.Combine(savePath, "background" + "#" + HeaderText + backgroundExtension), FileMode.Create);
+                            BitmapEncoder encoder = new PngBitmapEncoder();
+                            encoder.Frames.Add(BitmapFrame.Create(BackgroundPicture));
+                            encoder.Save(stream);
+                            stream.Dispose();
+                            break;
+                        }
+                    case ".bmp":
+                        {
+                            FileStream stream = new FileStream(Path.Combine(savePath, "background" + "#" + HeaderText + backgroundExtension), FileMode.Create);
+                            BitmapEncoder encoder = new BmpBitmapEncoder();
+                            encoder.Frames.Add(BitmapFrame.Create(BackgroundPicture));
+                            encoder.Save(stream);
+                            stream.Dispose();
+                            break;
+                        }
+                    case ".gif":
+                        {
+                            FileStream stream = new FileStream(Path.Combine(savePath, "background" + "#" + HeaderText + backgroundExtension), FileMode.Create);
+                            BitmapEncoder encoder = new GifBitmapEncoder();
+                            encoder.Frames.Add(BitmapFrame.Create(BackgroundPicture));
+                            encoder.Save(stream);
+                            stream.Dispose();
+                            break;
+                        }
+                }
+                var json = JsonConvert.SerializeObject(QuestionsAnswers.ToArray());
+                File.WriteAllText(Path.Combine(savePath, "questions.json"), json);
+                initializeApplication();
             }
-            
         }
 
         private void LoadPreviousQuestion()
@@ -341,7 +460,7 @@ namespace Mellansel_Quiz_Maker.ViewModel
             }
 
             SelectedQuestion++;
-            if (QuestionsAnswers.Count <= SelectedQuestion)
+            if (QuestionsAnswers.Count < SelectedQuestion)
             {
                 QuestionsAnswers.Add(new QuestionData());
                 SelectedPicture = new BitmapImage();
@@ -374,11 +493,17 @@ namespace Mellansel_Quiz_Maker.ViewModel
                     Alt1Correct = false;
                     Alt3Correct = false;
                 }
-                else
+                else if(CA == Alternative3Text)
                 {
                     Alt3Correct = true;
                     Alt1Correct = false;
                     Alt2Correct = false;
+                }
+                else
+                {
+                    Alt1Correct = false;
+                    Alt2Correct = false;
+                    Alt3Correct = false;
                 }
             }
             DeleteQuestionCommand.RaiseCanExecuteChanged();
