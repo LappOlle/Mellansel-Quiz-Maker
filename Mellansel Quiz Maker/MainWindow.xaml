@@ -5,8 +5,74 @@
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:local="clr-namespace:Mellansel_Quiz_Maker"
         mc:Ignorable="d"
-        Title="MainWindow" Height="350" Width="525">
+        Title="Quiz Maker" Height="600" Width="800"
+        DataContext="{Binding Main,Source={StaticResource Locator}}"
+        WindowState="Maximized"
+        MinWidth="800">
+
     <Grid>
-        
+        <Grid.Background>
+            <ImageBrush ImageSource="{Binding BackgroundPicture}"/>
+        </Grid.Background>
+        <Grid.RowDefinitions>
+            <RowDefinition Height="1*"/>
+            <RowDefinition Height="6*"/>
+            <RowDefinition Height="1*"/>
+            <RowDefinition Height="1*"/>
+            <RowDefinition Height="1*"/>
+            <RowDefinition Height="1*"/>
+        </Grid.RowDefinitions>
+        <Grid.ColumnDefinitions>
+            <ColumnDefinition Width="2*"/>
+            <ColumnDefinition Width="5*"/>
+            <ColumnDefinition Width="5*"/>
+            <ColumnDefinition Width="5*"/>
+            <ColumnDefinition Width="2*"/>
+        </Grid.ColumnDefinitions>
+        <Grid Grid.Column="1" Grid.ColumnSpan="3" Grid.Row="2" Grid.RowSpan="4" Background="Beige">
+          
+        </Grid>
+        <TextBox Grid.Column="1" Grid.Row="0" Grid.ColumnSpan="3" HorizontalAlignment="Center" MinWidth="100" VerticalAlignment="Center" FontSize="30" Text="{Binding HeaderText}"/>
+        <Grid Grid.Column="1" Grid.Row="1" Grid.ColumnSpan="3" Background="Beige">
+            <Image Source="{Binding SelectedPicture}"/>
+        </Grid>
+        <StackPanel Orientation="Horizontal" Grid.Column="1" Grid.Row="4">
+            <Button Width="80" HorizontalAlignment="Left" Margin="10" Command="{Binding SelectPictureCommand}" Content="Välj frågebild"/>
+            <Button Width="80" HorizontalAlignment="Left" Margin="10" Content="Ta bort fråga" Command="{Binding DeleteQuestionCommand}"/>
+        </StackPanel>
+        <StackPanel Orientation="Horizontal" Grid.Column="1" Grid.Row="5">
+            <Button Width="80" HorizontalAlignment="Left" Margin="10" Command="{Binding SelectBackgroundCommand}" Content="Välj bakgrund"/>
+        </StackPanel>
+        <StackPanel Orientation="Horizontal" Grid.Column="3" Grid.ColumnSpan="2" Grid.Row="4">
+            <Button HorizontalAlignment="Right" Margin="10" Content="Föregående" Width="80" Command="{Binding PreviousQuestionCommand}"/>
+            <Button Margin="10" HorizontalAlignment="Right" Content="Nästa" Width="80" Command="{Binding NextQuestionCommand}"/>
+        </StackPanel>
+        <StackPanel Orientation="Horizontal" Grid.Column="2" Grid.Row="4">
+            <Label Content="Rätt svar:" FontSize="20" VerticalAlignment="Center"/>
+            <Label Content="1" FontSize="20" VerticalAlignment="Center"/>
+            <RadioButton Command="{Binding AnswerSelectedCommand}" CommandParameter="alt1" IsChecked="{Binding Alt1Correct}" VerticalAlignment="Center" />
+            <Label Content="2" FontSize="20" VerticalAlignment="Center"/>
+            <RadioButton Command="{Binding AnswerSelectedCommand}" CommandParameter="alt2" IsChecked="{Binding Alt2Correct}" VerticalAlignment="Center"/>
+            <Label Content="3" FontSize="20" VerticalAlignment="Center"/>
+            <RadioButton Command="{Binding AnswerSelectedCommand}" CommandParameter="alt3" IsChecked="{Binding Alt3Correct}" VerticalAlignment="Center"/>
+        </StackPanel>
+        <Button Margin="10" Grid.Column="3" HorizontalAlignment="Right" Grid.Row="5" Width="80" Content="Exportera" Command="{Binding SaveQuestionsCommand}"/>
+        <DockPanel Grid.Column="1" Grid.ColumnSpan="3" Grid.Row="2">
+            <Label VerticalAlignment="Center" FontSize="30" Content="Fråga:"></Label>
+            <TextBlock VerticalAlignment="Center" Margin="0,0,10,0" FontSize="30" Text="{Binding SelectedQuestion}"/>
+            <TextBox HorizontalAlignment="Stretch" VerticalAlignment="Center" Margin="5" FontSize="30" Text="{Binding QuestionText}"/>
+        </DockPanel>
+        <DockPanel Grid.Column="1" Grid.Row="3">
+            <Label VerticalAlignment="Center" Content="Alt 1:" FontSize="20"/>
+            <TextBox VerticalAlignment="Center" MaxWidth="250" FontSize="20" Text="{Binding Alternative1Text}"></TextBox>
+        </DockPanel>
+        <DockPanel Grid.Column="2" Grid.Row="3">
+            <Label VerticalAlignment="Center" Content="Alt 2:" FontSize="20"/>
+            <TextBox VerticalAlignment="Center" MaxWidth="250" FontSize="20" Text="{Binding Alternative2Text}"></TextBox>
+        </DockPanel>
+        <DockPanel Grid.Column="3" Grid.Row="3">
+            <TextBlock VerticalAlignment="Center" Text="Alt 3:" FontSize="20"/>
+            <TextBox VerticalAlignment="Center" MaxWidth="250" FontSize="20" Text="{Binding Alternative3Text}"></TextBox>
+        </DockPanel>
     </Grid>
 </Window>
